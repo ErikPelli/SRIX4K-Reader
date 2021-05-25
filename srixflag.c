@@ -1,4 +1,4 @@
-#include "srix-flag.h"
+#include "srixflag.h"
 
 void srixFlagAdd(SrixFlag flag[static 1], uint8_t block) {
     /*
