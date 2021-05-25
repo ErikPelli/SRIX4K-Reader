@@ -33,9 +33,9 @@ static void nfcContextInit() {
 
 /**
  * Initialize a NFC device as reader.
- * @param reader pointer to a reader to initialize.
- * @param target string that represent a found reader.
- * @return SrixError instance, if there is an error it will include its description.
+ * @param reader pointer to a reader to initialize
+ * @param target string that represent a found reader
+ * @return SrixError instance, if there is an error it will include its description
  */
 static SrixError nfcReaderInit(NfcReader *reader, int target) {
     /* Open target reader */
@@ -56,8 +56,8 @@ static SrixError nfcReaderInit(NfcReader *reader, int target) {
 
 /**
  * Search for a valid SRIX4K tag to initialize and do polling if it isn't available.
- * @param reader pointer to a NFC device.
- * @return SrixError instance, if there is an error it will include its description.
+ * @param reader pointer to a NFC device
+ * @return SrixError instance, if there is an error it will include its description
  */
 static SrixError nfcSrix4kInit(NfcReader *reader) {
     /*
@@ -78,12 +78,12 @@ static SrixError nfcSrix4kInit(NfcReader *reader) {
 
 /**
  * Send bytes to the SRIX tag and save the response.
- * @param target NFC device pointer.
- * @param tx_data array of bytes to send.
- * @param tx_size number of bytes to send.
- * @param rx_data pointer to an array of bytes where save the response.
- * @param rx_size size of rx_data array.
- * @return NFC response length in bytes.
+ * @param target NFC device pointer
+ * @param tx_data array of bytes to send
+ * @param tx_size number of bytes to send
+ * @param rx_data pointer to an array of bytes where save the response
+ * @param rx_size size of rx_data array
+ * @return NFC response length in bytes
  */
 static inline size_t nfcExchange(nfc_device *target, const uint8_t *restrict tx_data, const size_t tx_size,
                                  uint8_t *restrict rx_data, const size_t rx_size) {
