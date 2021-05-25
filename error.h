@@ -26,4 +26,12 @@ typedef struct SrixError {
 #define SRIX_ERROR(type, errorMessage)    ((SrixError) {.errorType = (type), .message = (errorMessage)})
 #define SRIX_IS_ERROR(isError)            ((isError).errorType != SRIX_SUCCESS)
 
+/**
+ * SRIX4K constants
+ */
+#define SRIX_BLOCK_LENGTH  4
+#define SRIX_UID_LENGTH    8
+#define SRIX4K_BLOCKS      128
+#define SRIX4K_BYTES       512
+
 #endif /* ERROR_H */
