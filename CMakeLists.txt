@@ -26,5 +26,5 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELEASE} -Wall -Wextra -pipe")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -s")
 
 # Compile mikai CLI executable
-add_executable(SRIX4K-Reader main.c srix.c reader.c)
+add_executable(SRIX4K-Reader main.c srix.c srixflag.c reader.c)
 target_link_libraries(SRIX4K-Reader ${LIBNFC_LIBRARIES})
