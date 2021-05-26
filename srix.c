@@ -19,6 +19,7 @@ struct Srix {
     uint64_t uid;                       /* SRIX UID */
     SrixFlag blockFlags;                /* Modified block flags */
     NfcReader *reader;                  /* NFC Reader */
+    SrixError error;                         /* Error */
 };
 
 /**
@@ -107,6 +108,8 @@ Srix *SrixNew() {
     }
 
     created->reader = NfcReaderNew();
+    created->error = SRIX_NO_ERROR;
+    created->error.message = "";
 
     return created;
 }
@@ -125,7 +128,17 @@ char *NfcGetDescription(Srix *target, int reader) {
     return NfcGetReaderDescription(target->reader, reader);
 }
 
-SrixError SrixNfcInit(Srix target[static 1], int reader) {
+const char *SrixGetLatestError(Srix target[static 1]) {
+    const char *message = target->error.message;
+
+    /* Reset error */
+    target->error = SRIX_NO_ERROR;
+    target->error.message = "";
+
+    return message;
+}
+
+const char *SrixNfcInit(Srix target[static 1], int reader) {
     target->blockFlags = SRIX_FLAG_INIT;
     NfcCloseReader(target->reader);
     NfcInitReader(target->reader, reader);
@@ -133,16 +146,16 @@ SrixError SrixNfcInit(Srix target[static 1], int reader) {
     /* Get SRIX4K UID & EEPROM */
     SrixError error = getUid(target);
     if (SRIX_IS_ERROR(error)) {
-        NfcCloseReader(target->reader);
-        return error;
+        SrixDelete(target);
+        return error.message;
     }
 
     error = readBlocks(target);
     if (SRIX_IS_ERROR(error)) {
-        NfcCloseReader(target->reader);
+        SrixDelete(target);
     }
 
-    return error;
+    return error.message;
 }
 
 void SrixMemoryInit(Srix target[static 1], uint32_t eeprom[const static SRIX4K_BLOCKS], uint64_t uid) {
@@ -170,35 +183,36 @@ void SrixModifyBlock(Srix target[static 1], const uint32_t block, const uint8_t 
     srixFlagAdd(&target->blockFlags, blockNum);
 }
 
-SrixError SrixWriteBlocks(Srix target[static 1]) {
+int SrixWriteBlocks(Srix target[static 1]) {
     if (!target->reader) {
-        return SRIX_ERROR(SRIX_ERROR, "NFC reader hasn't been initialized");
+        target->error = SRIX_ERROR(SRIX_ERROR, "NFC reader hasn't been initialized");
+        return target->error.errorType;
     }
 
     /* Counter blocks */
-    SrixError error = srixWriteGroup(target, target->counter, sizeof(target->counter) / sizeof(uint32_t));
-    if (SRIX_IS_ERROR(error)) {
-        return error;
+    target->error = srixWriteGroup(target, target->counter, sizeof(target->counter) / sizeof(uint32_t));
+    if (SRIX_IS_ERROR(target->error)) {
+        return target->error.errorType;
     }
 
     /* OTP blocks */
-    error = srixWriteGroup(target, target->otp, sizeof(target->otp) / sizeof(uint32_t));
-    if (SRIX_IS_ERROR(error)) {
-        return error;
+    target->error = srixWriteGroup(target, target->otp, sizeof(target->otp) / sizeof(uint32_t));
+    if (SRIX_IS_ERROR(target->error)) {
+        return target->error.errorType;
     }
 
     /* Lockable blocks */
-    error = srixWriteGroup(target, target->lockable, sizeof(target->lockable) / sizeof(uint32_t));
-    if (SRIX_IS_ERROR(error)) {
-        return error;
+    target->error = srixWriteGroup(target, target->lockable, sizeof(target->lockable) / sizeof(uint32_t));
+    if (SRIX_IS_ERROR(target->error)) {
+        return target->error.errorType;
     }
 
     /* Generic blocks */
-    error = srixWriteGroup(target, target->generic, sizeof(target->generic) / sizeof(uint32_t));
-    if (SRIX_IS_ERROR(error)) {
-        return error;
+    target->error = srixWriteGroup(target, target->generic, sizeof(target->generic) / sizeof(uint32_t));
+    if (SRIX_IS_ERROR(target->error)) {
+        return target->error.errorType;
     }
 
     target->blockFlags = SRIX_FLAG_INIT;
-    return SRIX_NO_ERROR;
+    return SRIX_NO_ERROR.errorType;
 }

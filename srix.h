@@ -38,9 +38,9 @@ char *NfcGetDescription(Srix *target, int reader);
  * Initialize the Srix using Nfc.
  * @param target pointer to Srix struct
  * @param reader index of nfc reader to use
- * @return SrixError result
+ * @return string error result
  */
-SrixError SrixNfcInit(Srix *target, int reader);
+const char *SrixNfcInit(Srix *target, int reader);
 
 /**
  * Initialize the Srix using values in memory.
@@ -76,8 +76,8 @@ void SrixModifyBlock(Srix *target, uint32_t block, uint8_t blockNum);
 /**
  * Write all modified blocks of target to physical SRIX4K.
  * @param target pointer to Srix struct
- * @return SrixError result
+ * @return numeric result, 0 = no error
  */
-SrixError SrixWriteBlocks(Srix *target);
+int SrixWriteBlocks(Srix *target);
 
 #endif /* SRIX_H */
